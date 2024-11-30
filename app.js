@@ -19,7 +19,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/events", eventRoutes);
 
 // Route de test API
-app.get("/api/health", (req, res) => {
+app.get("/", (req, res) => {
   res.status(200).json({ status: "OK", message: "API opérationnelle" });
 });
 
