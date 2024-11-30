@@ -1,6 +1,6 @@
 // src/controllers/userControllers.js
 import User from "../models/user.js";
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { ValidationError } from "sequelize";
 
@@ -15,7 +15,7 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ message: "Cet email est déjà utilisé" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const hashedPassword = await bcryptjs.hash(password, 12);
     const newUser = await User.create({
       name,
       email,
@@ -56,7 +56,7 @@ export const loginUser = async (req, res) => {
       return res.status(401).json({ message: "Email ou mot de passe incorrect" });
     }
 
-    const isValidPassword = await bcrypt.compare(password, user.password);
+    const isValidPassword = await bcryptjs.compare(password, user.password);
     if (!isValidPassword) {
       return res.status(401).json({ message: "Email ou mot de passe incorrect" });
     }
@@ -108,11 +108,11 @@ export const updateUserProfile = async (req, res) => {
 
     // Si changement de mot de passe
     if (currentPassword && newPassword) {
-      const isValidPassword = await bcrypt.compare(currentPassword, user.password);
+      const isValidPassword = await bcryptjs.compare(currentPassword, user.password);
       if (!isValidPassword) {
         return res.status(401).json({ message: "Mot de passe actuel incorrect" });
       }
-      user.password = await bcrypt.hash(newPassword, 12);
+      user.password = await bcryptjs.hash(newPassword, 12);
     }
 
     // Mise à jour des autres champs
