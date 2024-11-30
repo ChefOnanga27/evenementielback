@@ -1,7 +1,7 @@
 // src/routes/userRoutes.js
 import express from "express";
 import { registerUser, loginUser, getUserProfile, updateUserProfile, deleteUser } from "../controllers/userControllers.js";
-import { verifyToken } from "../middlewares/authMiddleware.js";
+import { verifyToken } from "../middlewares/authmiddleware.js";
 import { validateUser } from "../middlewares/validationMiddleware.js";
 
 const router = express.Router();
