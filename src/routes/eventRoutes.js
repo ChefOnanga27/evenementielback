@@ -10,7 +10,7 @@ import {
   joinEvent,
   leaveEvent
 } from "../controllers/eventController.js";
-import { verifyToken } from "../middlewares/authMiddleware.js";
+import { verifyToken } from "../middlewares/authmiddleware.js";
 import { validateEvent } from "../middlewares/validationMiddleware.js";
 
 const router = express.Router();
