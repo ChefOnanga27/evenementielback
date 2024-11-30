@@ -14,6 +14,13 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Middleware CORS
+const corsOptions = {
+  origin: "http://localhost:3000", // Remplacez par l'origine autorisée
+  methods: "GET,POST,PUT,DELETE",
+  credentials: true, // Autorise l'envoi de cookies ou d'en-têtes sécurisés
+};
+
 // Routes
 app.use("/api/users", userRoutes);
 app.use("/api/events", eventRoutes);

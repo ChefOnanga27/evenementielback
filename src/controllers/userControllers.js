@@ -1,14 +1,19 @@
-// src/controllers/userControllers.js
 import User from "../models/user.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { ValidationError } from "sequelize";
+import validator from "validator"; // Pour la validation de l'email
 
 // Inscription
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
     
+    // Vérification du format de l'email
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ message: "Email invalide" });
+    }
+
     // Vérifier si l'utilisateur existe déjà
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
@@ -25,7 +30,7 @@ export const registerUser = async (req, res) => {
     // Créer le token
     const token = jwt.sign(
       { id: newUser.id },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || "default_secret", // Utilisation d'une valeur par défaut si JWT_SECRET est manquant
       { expiresIn: "24h" }
     );
 
@@ -42,6 +47,7 @@ export const registerUser = async (req, res) => {
     if (error instanceof ValidationError) {
       return res.status(400).json({ message: error.message });
     }
+    console.error(error); // Ajout d'un log pour mieux comprendre l'erreur
     res.status(500).json({ message: "Erreur lors de l'inscription" });
   }
 };
@@ -50,8 +56,10 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({
+      where: { email },
+      attributes: ['id', 'name', 'email', 'password'] // Inclure le mot de passe
+    });
     if (!user) {
       return res.status(401).json({ message: "Email ou mot de passe incorrect" });
     }
@@ -63,7 +71,7 @@ export const loginUser = async (req, res) => {
 
     const token = jwt.sign(
       { id: user.id },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || "default_secret", //
       { expiresIn: "24h" }
     );
 
@@ -77,6 +85,7 @@ export const loginUser = async (req, res) => {
       token
     });
   } catch (error) {
+    console.error(error); // Ajout d'un log pour mieux comprendre l'erreur
     res.status(500).json({ message: "Erreur lors de la connexion" });
   }
 };
@@ -92,6 +101,7 @@ export const getUserProfile = async (req, res) => {
     }
     res.status(200).json(user);
   } catch (error) {
+    console.error(error); // Ajout d'un log pour mieux comprendre l'erreur
     res.status(500).json({ message: "Erreur lors de la récupération du profil" });
   }
 };
@@ -133,6 +143,7 @@ export const updateUserProfile = async (req, res) => {
     if (error instanceof ValidationError) {
       return res.status(400).json({ message: error.message });
     }
+    console.error(error); // Ajout d'un log pour mieux comprendre l'erreur
     res.status(500).json({ message: "Erreur lors de la mise à jour du profil" });
   }
 };
@@ -148,6 +159,7 @@ export const deleteUser = async (req, res) => {
     await user.destroy();
     res.status(200).json({ message: "Compte supprimé avec succès" });
   } catch (error) {
+    console.error(error); // Ajout d'un log pour mieux comprendre l'erreur
     res.status(500).json({ message: "Erreur lors de la suppression du compte" });
   }
 };
